@@ -1,41 +1,5 @@
----
-title: "youtube"
-output: html_document
-editor_options: 
-  chunk_output_type: console
----
-
-```{r}
-install.packages("tuber")
-library(tuber)
-yt_oauth(app_id = "", app_secret = "", token = "")
-```
-
-# Stats
-
-```{r}
-df = get_all_channel_video_stats(channel_id="UC_dZp8bZipnjntBGLVHm6rw")
-```
-
-# comments
-```{r}
-comments = get_all_comments(video_id = "90ocWSDIh0A")
-```
-
-# Information
-
-```{r}
-get_video_details(video_id = "HPsWXiYTcpU")
-```
-
-# Captions
-
-```{r}
-library(httr)
-library(rvest)
-
 get_captions_modified = function(x){
-  captions = list_caption_tracks(video_id = x)
+  captions = list_caption_tracks(video_id = x) 
   if(c('en') %in% captions$language){
     lang = 'en'
   } else {
@@ -58,17 +22,6 @@ get_captions_modified = function(x){
       return(y) 
     } else {
       return('none')
-      }
     }
+  }
 }
-```
-
-## check
-
-```{r}
-x = list_caption_tracks(video_id = 'wFqRbP4qXeo')
-get_captions('3ALgl8Q5kSEofBsCHNT2dp43oon-ev_OnGr4l6ZYc-M=') # doesn't work
-get_captions_modified('wFqRbP4qXeo') # works!
-```
-
-
