@@ -8,6 +8,9 @@ editor_options:
 ```{r}
 library(tidyverse)
 library(tuber)
+library(rvest)
+library(httr)
+library(devtools)
 yt_oauth(app_id = "", app_secret = "", token = "")
 ```
 
@@ -26,13 +29,24 @@ for(i in c(1:214)){
 ```
 
 ```{r}
-for (i in as.character(migr_df$video_id)){
+source_url("https://raw.githubusercontent.com/voskresenskiy/migrationspakt/master/captions.R")
+comments = data.frame()
+captions = data.frame()
+
+for (i in as.character(migr_df$video_id[1:5])){
   tryCatch({
-  comments = get_all_comments(video_id = i)
-  comments_all2 = bind_rows(comments_all2, comments)
-  captions = get_captions_modified(i)
-  if(str_length(captions) > 5){
-    captions_all = rbind(captions_all, data.frame(video_id = i, captions = captions))
+  c = get_all_comments(video_id = i)
+  comments = bind_rows(c, comments)
+  par = na.omit(unique(c$parentId))
+  for(j in par){
+    c_p = get_comments(filter = c(comment_id = j))
+    if(nrow(c_p[!(c_p$id %in% c$id),]) > 0){
+      comments = bind_rows(comments, c_p)
+    }
+  }
+  cap = get_captions_modified(i)
+  if(str_length(cap) > 5){
+    captions = rbind(captions, data.frame(video_id = i, captions = cap))
   }
   print(i)
   }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
